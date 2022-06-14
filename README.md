@@ -1,3 +1,3 @@
 # liquid
 
-![Autopoiesis screenshot](images/screenshot.png)
+![Autopoiesis screenshot](images/ScreenShot.png)
