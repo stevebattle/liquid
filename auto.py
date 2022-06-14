@@ -56,15 +56,6 @@ class Autopoiesis(Framework):
         # weightless world
         self.world.gravity = (0, 0)
 
-        # edge
-        v1 = (-10.0, 0.0)
-        v2 = (-7.0, -1.0)
-        v3 = (-4.0, 0.0)
-        v4 = (0.0, 0.0)
-        v5 = (4.0, 0.0)
-        v6 = (7.0, 1.0)
-        v7 = (10.0, 0.0)
-
         # confinement field
         border = self.world.CreateStaticBody(
             shapes=[b2EdgeShape(vertices=[(-SIDE/2+OFFSETX, -SIDE/2+OFFSETY), (SIDE/2+OFFSETX, -SIDE/2+OFFSETY)]),
