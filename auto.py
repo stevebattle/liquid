@@ -76,8 +76,6 @@ class Autopoiesis(Framework):
         # A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
         sub = b2FixtureDef(shape=b2CircleShape(radius=SUB_RADIUS), density=DENSITY, friction=FRICTION)
         cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(CAT_SIDE)), density=DENSITY, friction=FRICTION)
-        #catSensor = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(CAT_SIDE)), density=DENSITY, friction=0FRICTION)
-        #catSensor.isSensor = True
         link = b2FixtureDef(shape=b2PolygonShape(box=(LINK_SIDE,LINK_SIDE)), density=DENSITY, friction=FRICTION, userData="link")
 
         # The N body problem
