@@ -4,7 +4,7 @@ Living systems cannot be understood separately from they environment they live i
 
 Simluated autopoiesis is a demonstration of how autopoiesis works but, according to Maturana, is not itself alive because software operates in a virtual rather than a physical space. The system is defined as a network of simulated chemical reactions, bathed in a liquid substrate that provides the raw materials from which the system builds itself. The seed is a catalytic agent (triangle) that transforms the substrate (circles) into its structural building blocks (squares). These are able to self-assemble (blue links), forming a boundary around the catalyst.
 
-This is a particle simulation with additional rules about how particle state changes on contact with other particles. Unlike cellular automata, there is no fixed grid, just particles moving about and colliding with each other. By analogy with cellular automata, we call this a 'liquid automaton'. This system is based on just three rules, defined below, based on a _cellular_ automaton devised by Varela. 
+This is a 2D particle simulation with additional rules about how particle state changes on contact with other particles. Unlike cellular automata, there is no fixed grid, just particles moving about and colliding with each other. By analogy with cellular automata, we call this a 'liquid automaton'. This system is based on just three rules, defined below, based on a _cellular_ automaton devised by Varela. 
 
 1. composition: K + 2S -> K + L
 2. concatenation: L0-L1- ... -Ln + L -> L0-L1- ... -Ln+1
@@ -14,6 +14,8 @@ Where:
 * K - catalyst
 * S - substrate
 * L - link
+
+Composition only occurs when a catalyst is in contact with a pair of substrate particles, which are fused together to form a link particle. Concatenation enables the self-assembly of the boundary. Link are able to make up to two connections, and when two links collide that are able to do so, they form a bond between them (shown as a blue line). Links are also subject to decay, and may spontaneously disintegrate back into a pair of substrate particles.
 
 ## Installation
 
