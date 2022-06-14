@@ -4,7 +4,18 @@ Living systems cannot be understood separately from they environment they live i
 
 Simluated autopoiesis is a demonstration of how autopoiesis works, but is not itself alive because software operates in a virtual rather than a physical space. The system is defined as a network of simulated chemical reactions, bathed in a liquid substrate that provide the raw materials from which the system builds itself. The seed is a catalytic agent that transforms the substrate into its structural building blocks. These are able to self-assemble, forming a "cell wall" around the catalyst.
 
-Francsico Varela, "Principles of Biological Autonmy",  
+## Installation
+
+1. Install [PyBox2D](https://github.com/pybox2d/pybox2d):
+1.1 conda create -n pybox2d -c conda-forge python=3.6 pybox2d
+1.2 conda activate pybox2d
+2. Download the python code in this GitHub: auto.py
+3. Run
+3.1 python -m auto --backend=pygame 
+
+Francsico Varela, _Principles of Biological Autonmy_, North Holland, 1979. 
+
+
 
 ![Autopoiesis screenshot](images/ScreenShot.png)
 
