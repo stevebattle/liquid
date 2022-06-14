@@ -14,9 +14,9 @@ Simluated autopoiesis is a demonstration of how autopoiesis works, but is not it
 3. Run
   * python -m auto --backend=pygame 
 
-Humberto Maturana, Francisco J. Varela, _Autopoiesis and Cognition_, D. Reidel Publishing Co., 1972.
-Francsico Varela, _Principles of Biological Autonmy_, North Holland, 1979. 
-Hordijk, W., Steel, M. _Autocatalytic sets and boundaries_, J Syst Chem 6, 1, 2015.
+Humberto Maturana, Francisco J. Varela, _Autopoiesis and Cognition_, D. Reidel Publishing Co., 1972.  
+Francsico Varela, _Principles of Biological Autonmy_, North Holland, 1979.  
+Hordijk, W., Steel, M. _Autocatalytic sets and boundaries_, J Syst Chem 6, 1, 2015.  
 
 
 ![Autopoiesis screenshot](images/ScreenShot.png)
