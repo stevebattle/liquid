@@ -11,7 +11,7 @@ Simluated autopoiesis is a demonstration of how autopoiesis works, but is not it
   * conda activate pybox2d
   * pip install pygame
 2. Download the python code in this GitHub: auto.py
-3. Run
+3. Run auto.py:
   * python -m auto --backend=pygame 
 
 Humberto Maturana, Francisco J. Varela, _Autopoiesis and Cognition_, D. Reidel Publishing Co., 1972.  
