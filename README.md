@@ -4,6 +4,8 @@ Living systems cannot be understood separately from they environment they live i
 
 Simluated autopoiesis is a demonstration of how autopoiesis works and enables us to study simpler autopoietic systems not found in nature. The system is defined as a functionally closed chemical reaction system (CRS), bathed in a liquid substrate that provides the raw materials from which the system builds itself. The seed is a catalytic agent (triangle) that transforms the substrate (circles) into its structural building blocks (squares). These are able to self-assemble (blue links), forming a boundary around the catalyst, analogous to a cell wall. According to Maturana, these simulations are not themselves alive because software operates in a virtual rather than a physical space. However, even they are not alive, they are still autonomous, identity-preserving systems in their own right.
 
+![Autopoiesis screenshot](images/ScreenShot.png)
+
 This is a 2D particle simulation with additional rules about how particle state changes on contact with other particles. Unlike cellular automata, there is no fixed grid, just particles moving about and colliding with each other. By analogy with cellular automata, we call this a 'Liquid Automaton', a variety of _collision-based_ system. This system is based on just three rules, defined below, based on a _cellular_ automaton devised by Varela. 
 
 1. composition: K + 2S -> K + L
@@ -17,6 +19,7 @@ Where:
 
 Composition only occurs when a catalyst is in contact with a pair of substrate particles, which are fused together to form a link particle. Concatenation enables the self-assembly of the boundary. Link are able to make up to two connections, and when two links collide that are able to do so, they form a bond between them (shown as a blue line). As these links are being formed around the catalyst, it's likely that the bonded links will close the circle, forming a continuous boundary around the catalyst. Links are also subject to decay, and may spontaneously disintegrate back into a pair of substrate particles. In this experiment, a single catalyst particle is introduced at the beginning, which is not subject to disintegration.
 
+![Autopoiesis animation](images/animation.gif)
 
 ## Installation
 
@@ -35,7 +38,3 @@ Francsico Varela, _Principles of Biological Autonmy_, North Holland, 1979.
 Hordijk, W., Steel, M. _Autocatalytic sets and boundaries_, J Syst Chem 6, 1, 2015.  
 Tommaso Toffoli, Symbol Super Colliders, in Collision-Based Computing, Andrew Adamatzky (ed.), Springer, 2002.  
 Kurt W. Fleischer, A Multiple-Mechanism Developmental Model for Defining Self-Organizing Geometric Structures, California Institute of Technology, 1995
-
-![Autopoiesis screenshot](images/ScreenShot.png)
-
-![Autopoiesis animation](images/animation.gif)
