@@ -22,10 +22,10 @@ Composition only occurs when a catalyst is in contact with a pair of substrate p
 
 1. Install [PyBox2D](https://github.com/pybox2d/pybox2d):
   * conda create -n pybox2d -c conda-forge python=3.6 pybox2d
-  * conda activate pybox2d
   * pip install pygame
 2. Download the python code in this GitHub: auto.py
-3. Run auto.py:
+3. Run auto.py  
+  * conda activate pybox2d
   * python -m auto --backend=pygame 
 
 ## References
