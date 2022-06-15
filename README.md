@@ -7,7 +7,7 @@ Simluated autopoiesis is a demonstration of how autopoiesis works and enables us
 This is a 2D particle simulation with additional rules about how particle state changes on contact with other particles. Unlike cellular automata, there is no fixed grid, just particles moving about and colliding with each other. By analogy with cellular automata, we call this a 'Liquid Automaton'. This system is based on just three rules, defined below, based on a _cellular_ automaton devised by Varela. 
 
 1. composition: K + 2S -> K + L
-2. concatenation: Ln + L -> Ln+1
+2. concatenation: L~n~ + L -> L~n+1~
 3. disintegration:  L -> 2S
 
 Where:
