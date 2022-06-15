@@ -4,6 +4,7 @@ Living systems cannot be understood separately from they environment they live i
 
 Simluated autopoiesis is a demonstration of how autopoiesis works and enables us to study simpler autopoietic systems not found in nature. The system is defined as a functionally closed chemical reaction system (CRS), bathed in a liquid substrate that provides the raw materials from which the system builds itself. The seed is a catalytic agent (triangle) that transforms the substrate (circles) into its structural building blocks (squares). These are able to self-assemble (blue links), forming a boundary around the catalyst, analogous to a cell wall. According to Maturana, these simulations are not themselves alive because software operates in a virtual rather than a physical space. However, even they are not alive, they are still autonomous, identity-preserving systems in their own right.
 
+<image width=300 alt="autopoiesis screenshot" src="images/ScreenShot.png">
 ![Autopoiesis screenshot](images/ScreenShot.png)
 
 This is a 2D particle simulation with additional rules about how particle state changes on contact with other particles. Unlike cellular automata, there is no fixed grid, just particles moving about and colliding with each other. By analogy with cellular automata, we call this a 'Liquid Automaton', a variety of _collision-based_ system. This system is based on just three rules, defined below, based on a _cellular_ automaton devised by Varela. 
