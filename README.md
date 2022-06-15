@@ -28,6 +28,8 @@ Composition only occurs when a catalyst is in contact with a pair of substrate p
 3. Run auto.py:
   * python -m auto --backend=pygame 
 
+## References
+
 Humberto Maturana, Francisco J. Varela, _Autopoiesis and Cognition_, D. Reidel Publishing Co., 1972.  
 Francsico Varela, _Principles of Biological Autonmy_, North Holland, 1979.  
 Hordijk, W., Steel, M. _Autocatalytic sets and boundaries_, J Syst Chem 6, 1, 2015.  
