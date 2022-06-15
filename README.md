@@ -23,9 +23,9 @@ Composition only occurs when a catalyst comes into simultaneous contact with a p
 
 ## Installation
 
-1. Install [PyBox2D](https://github.com/pybox2d/pybox2d):
+1. Install [PyBox2D](https://github.com/pybox2d/pybox2d) and [pygame](https://www.pygame.org):
   * conda create -n pybox2d -c conda-forge python=3.6 pybox2d
-  * pip install [pygame](https://www.pygame.org)
+  * pip install pygame
 2. Download the python code in this GitHub: auto.py
 3. Run auto.py:  
   * conda activate pybox2d
