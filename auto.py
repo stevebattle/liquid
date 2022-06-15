@@ -167,7 +167,6 @@ class Autopoiesis(Framework):
         # Add new bond
         if type(contact.fixtureA.body.userData)==int and contact.fixtureA.body.userData<2 and \
            type(contact.fixtureB.body.userData)==int and contact.fixtureB.body.userData<2:
-            #£self.bonds.append((contact.fixtureA.body,contact.fixtureB.body))
             self.bonds.append(contact)
 
     def EndContact(self,contact):
