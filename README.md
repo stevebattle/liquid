@@ -21,6 +21,8 @@ Where:
 * L - link (square)
 
 Composition only occurs when a catalyst comes into simultaneous contact with a pair of substrate particles, which are then fused together to form a link particle. Concatenation enables the self-organisation of the boundary. Links are able to make up to two connections, and when two links collide, and are able to do so, they form a bond between them (shown as a blue line). As these links are being formed around the catalyst, it's likely that the bonded links will close the circle, enclosing the catalyst. The embodiment of the catalyst as a shape with a certain extent, creates an internal pressure that holds the links apart, (mostly) preventing them forming useless tight enclosures. These 'zombie' structures without a catalyst at their heart, lack the organisation necessary to repair themselves. Links are also subject to decay, and may spontaneously disintegrate back into a pair of substrate particles. Disintegration triggers the homeostatic repair of incomplete boundaries, and also serves to recycle 'waste' links that may have drifted too far from the catalyst, along with the aforementioned Zombies. In this experiment, a single catalyst particle is introduced at the beginning, which is not subject to disintegration. Autopoiesis is intriguing because re-production is not seen as an essential quality of life. Hence, this minimal model is not concerned with the creation of new catalyst.
+ 
+We present a Minimal Autopoietic Simulation, demonstrating both organisational and structural closure. It invites investigation of more interesting chemical networks with more sophisticated metabolisms.
 
 ![Autopoiesis animation](images/animation.gif)
 
