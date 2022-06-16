@@ -40,5 +40,5 @@ Humberto Maturana, Francisco J. Varela, _Autopoiesis and Cognition_, D. Reidel P
 Francsico Varela, _Principles of Biological Autonmy_, North Holland, 1979.  
 Hordijk, W., Steel, M. _Autocatalytic sets and boundaries_, J Syst Chem 6, 1, 2015.  
 Tommaso Toffoli, Symbol Super Colliders, in Collision-Based Computing, Andrew Adamatzky (ed.), Springer, 2002.  
-Kurt W. Fleischer, A Multiple-Mechanism Developmental Model for Defining Self-Organizing Geometric Structures, California Institute of Technology, 1995
+Kurt W. Fleischer, A Multiple-Mechanism Developmental Model for Defining Self-Organizing Geometric Structures, California Institute of Technology, 1995  
 Randall D Beer, Characterizing autopoiesis in the game of life, Artif Life. 2015 Winter;21(1):1-19. doi: 10.1162/ARTL_a_00143.
