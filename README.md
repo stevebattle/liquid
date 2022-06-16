@@ -16,9 +16,9 @@ This is a 2D particle simulation with additional rules about how particle state 
 3. disintegration:  L -> 2S
 
 Where:
-* K - catalyst
-* S - substrate
-* L - link
+* K - catalyst (triangle)
+* S - substrate (cricle)
+* L - link (squares)
 
 Composition only occurs when a catalyst comes into simultaneous contact with a pair of substrate particles, which are then fused together to form a link particle. Concatenation enables the self-assembly of the boundary. Links are able to make up to two connections, and when two links collide, and are able to do so, they form a bond between them (shown as a blue line). As these links are being formed around the catalyst, it's likely that the bonded links will close the circle, enclosing the catalyst. Links are also subject to decay, and may spontaneously disintegrate back into a pair of substrate particles. Disintegration demonstrates the homeostatic repair of incomplete boundaries, and also serves to recycle 'waste' links that may have drifted too far from the catalyst, and may even have formed 'zombie' closed-loops without a catalyst at their heart, and so lack the organisation necessary to repair themselves. In this experiment, a single catalyst particle is introduced at the beginning, which is not subject to disintegration.
 
