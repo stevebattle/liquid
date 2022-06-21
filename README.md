@@ -39,7 +39,7 @@ We present a Minimal Autopoietic Simulation, demonstrating both organisational a
 ## References
 
 Humberto Maturana, Francisco J. Varela, _Autopoiesis and Cognition_, D. Reidel Publishing Co., 1972.  
-Francsico Varela, _Principles of Biological Autonmy_, North Holland, 1979.  
+Francsico Varela, _Principles of Biological Autonomy_, North Holland, 1979.  
 Hordijk, W., Steel, M. _Autocatalytic sets and boundaries_, J Syst Chem 6, 1, 2015.  
 Tommaso Toffoli, Symbol Super Colliders, in Collision-Based Computing, Andrew Adamatzky (ed.), Springer, 2002.  
 Kurt W. Fleischer, A Multiple-Mechanism Developmental Model for Defining Self-Organizing Geometric Structures, California Institute of Technology, 1995  
