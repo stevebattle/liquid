@@ -9,7 +9,7 @@ Simulated autopoiesis is a demonstration of how autopoiesis works and enables us
 
 <image width=300 alt="autopoiesis screenshot" src="images/ScreenShot.png">
 
-This is a 2D particle simulation with additional rules about how particle state changes on contact with other particles. Unlike cellular automata, there is no fixed grid, just particles moving about and colliding with each other in a continuous space. By analogy with cellular automata, we call this a 'Liquid Automaton', a variety of _collision-based_ system. This system is based on just three rules, defined below, based on a _cellular_ automaton devised by Varela. These rules are invoked on contact (as with rules 1 and 2), or may occur spontaneously (as with rule 3).
+This is a 2D particle simulation with additional rules about how particle state changes on contact with other particles. Unlike cellular automata, there is no fixed grid, just particles moving about and colliding with each other in a continuous space. Similarly, there is no clock setting the beat on which the rules are applied; time is continuous and the rules are applied when objects collide, or spontaneously. By analogy with cellular automata, we call this a 'Liquid Automaton', a variety of _collision-based_ system. This system is based on just three rules, defined below, based on a _cellular_ automaton devised by Varela. These rules are invoked on contact (as with rules 1 and 2), or may occur spontaneously (as with rule 3).
 
 1. composition: K + 2S -> K + L
 2. concatenation: L<sub>n</sub> + L -> L<sub>n+1</sub>
