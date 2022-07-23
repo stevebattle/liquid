@@ -374,7 +374,7 @@ def disintegration():
                 p = nh[randint(0,len(nh)-1)]
                 setCell(p, Substrate())
 
-            elif len(nx)>0: # no holes in the immediate neighbourhood, check extended neighbourhood 1' to 4'
+            elif len(nx)>0: # no holes in the immediate neighbourhood, check prime neighbourhood 1' to 4'
                 p = nx[randint(0,len(nx)-1)]
                 setCell(p, Substrate())
 
