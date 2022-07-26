@@ -12,7 +12,8 @@
 # BL - bonded link
 
 from inspect import _void
-from math import cos, sin, pi
+from math import cos, sin, pi, sqrt, atan
+from scipy.stats import norm
 import random
 from Box2D.examples.framework import (Framework, Keys, main)
 from Box2D import (b2World, b2DistanceJointDef, b2PrismaticJointDef, b2WheelJointDef, b2EdgeShape, b2FixtureDef, b2PolygonShape, b2CircleShape)
@@ -31,6 +32,10 @@ LINK_SIDE = 0.9
 DENSITY = 4
 FRICTION = 0.2
 DECAY_RATE = 0.0005
+
+# Wiener Process 
+DELTA = 0.25*15
+DT = 0.1*15
 
 def triangle(r):
     return [(r,0),(r*cos(4*pi/3),r*sin(4*pi/3)),(r*cos(2*pi/3),r*sin(2*pi/3))]
@@ -84,18 +89,13 @@ class Autopoiesis(Framework):
         global link, sub
         super(Autopoiesis, self).Step(settings)
         for body in self.bodies:
-            # Apply random 'brownian' forces to substrate at each step
-            if body.userData=="sub":
-                # Random angle change 'Brownian motion'
-                body.angle += random.uniform(-0.3,0.3)
-                w = 1
-                force = (w*cos(body.angle), w*sin(body.angle))
-                body.ApplyLinearImpulse(force,body.position, True)
+            # Apply random 'brownian' forces (Wiener process) to substrate at each step
+            # see https://scipy-cookbook.readthedocs.io/items/BrownianMotion.html
+            force = (norm.rvs(scale=DELTA**2*DT), norm.rvs(scale=DELTA**2*DT))
+            body.ApplyLinearImpulse(force,body.position, True)
                 
-            # catalyst tends to the origin
-            elif body.userData=="cat":
-                body.angle += random.uniform(-0.3,0.3)
-                # Pressure towards origin to avoid being trapped against the wall
+            # catalyst pressure towards origin to avoid being trapped against the wall
+            if body.userData=="cat":
                 w = 8
                 force = (-w*(body.position[0]-OFFSETX),-w*(body.position[1]-OFFSETY))
                 body.ApplyForce(force,body.position, True)
