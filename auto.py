@@ -15,6 +15,7 @@ from inspect import _void
 from math import cos, sin, pi, sqrt, atan
 from scipy.stats import norm
 import random
+from time import time
 from Box2D.examples.framework import (Framework, Keys, main)
 from Box2D import (b2World, b2DistanceJointDef, b2PrismaticJointDef, b2WheelJointDef, b2EdgeShape, b2FixtureDef, b2PolygonShape, b2CircleShape)
 
@@ -34,8 +35,9 @@ FRICTION = 0.2
 DECAY_RATE = 0.0005
 
 # Wiener Process 
-DELTA = 0.25*15
-DT = 0.1*15
+DELTA = 15
+
+lastTime = time()
 
 def triangle(r):
     return [(r,0),(r*cos(4*pi/3),r*sin(4*pi/3)),(r*cos(2*pi/3),r*sin(2*pi/3))]
@@ -86,12 +88,18 @@ class Autopoiesis(Framework):
         bodies = self.bodies
 
     def Step(self, settings):
-        global link, sub
+        global link, sub, lastTime
         super(Autopoiesis, self).Step(settings)
+
+        # determine dt using the clock
+        timeNow = time()
+        dt = timeNow - lastTime
+        lastTime = timeNow
+
         for body in self.bodies:
             # Apply random 'brownian' forces (Wiener process) to substrate at each step
             # see https://scipy-cookbook.readthedocs.io/items/BrownianMotion.html
-            force = (norm.rvs(scale=DELTA**2*DT), norm.rvs(scale=DELTA**2*DT))
+            force = (norm.rvs(scale=DELTA**2*dt), norm.rvs(scale=DELTA**2*dt))
             body.ApplyLinearImpulse(force,body.position, True)
                 
             # catalyst pressure towards origin to avoid being trapped against the wall
