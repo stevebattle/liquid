@@ -1,8 +1,7 @@
-import pygame
-from pygame.locals import *
+from processing_py import *
 from random import random, randint, shuffle
 from functools import reduce
-from math import radians, sin, cos
+from math import radians
 from time import sleep
 
 SIDE = 400
@@ -16,14 +15,7 @@ DELAY = 100
 # A disintegration probability of less than about 0.01 per time step is required
 Pd = 0.01
 
-# pygame color objects
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-
-pygame.init()
-window = pygame.display.set_mode((SIDE,SIDE))
-FPS = 10
-frameRate = pygame.time.Clock()
+app = App(SIDE,SIDE)
 
 class Vector:
     def __init__(self,x,y):
@@ -42,16 +34,23 @@ class Vector:
 
 class Substrate:
     def draw(self,x,y): # draw a circle
-        pygame.draw.circle(window, BLACK, (x,y), EXTENT/2, width=2)
+        app.pushStyle()
+        app.noFill()
+        app.strokeWeight(2)
+        app.ellipse(x,y,EXTENT,EXTENT)
+        app.popStyle()
 
 class Catalyst:
     def draw(self,x,y): # draw an asterisk
-        r = EXTENT/3
-        pygame.draw.line(window, BLACK, (x,y-r), (x,y+r), width=2)
-        a = radians(60)
-        pygame.draw.line(window, BLACK, (x+r*sin(a),y-r*cos(a)), (x-r*sin(a),y+r*cos(a)), width=2)
-        a = radians(-60)
-        pygame.draw.line(window, BLACK, (x+r*sin(a),y-r*cos(a)), (x-r*sin(a),y+r*cos(a)), width=2)
+        app.pushStyle()
+        app.strokeWeight(2)
+        app.pushMatrix()
+        app.translate(x,y)
+        for i in range(3):
+            app.line(0,-EXTENT/4,0,EXTENT/4)
+            app.rotate(radians(60))
+        app.popMatrix()
+        app.popStyle()
         
 class Link:
     def __init__(self):
@@ -66,11 +65,20 @@ class Link:
         assert n in self.bonds
         self.bonds.remove(n)
     def draw(self,x,y): # square the circle
-        pygame.draw.circle(window, BLACK, (x,y), EXTENT/2*0.7, width=2)
-        pygame.draw.rect(window, BLACK, (x-EXTENT/2, y-EXTENT/2, EXTENT, EXTENT), 2)
+        app.pushStyle()
+        app.noFill()
+        app.strokeWeight(2)
+        app.rectMode(CENTER)
+        app.rect(x,y,EXTENT,EXTENT)
+        app.fill(255)
+        app.ellipse(x,y,EXTENT*0.7,EXTENT*0.7)
+        app.popStyle()
     def drawBonds(self,x,y):
+        app.pushStyle()
+        app.strokeWeight(2)
         for b in self.bonds:
-            pygame.draw.line(window, BLACK, (x,y), (x+N[b].x*SPACING/2,y+N[b].y*SPACING/2))
+            app.line(x,y,x+N[b].x*SPACING/2,y+N[b].y*SPACING/2)
+        app.popStyle()
 
 # An holey array
 a = [[ None for i in range(SIZE) ] for j in range(SIZE) ]
@@ -496,9 +504,9 @@ def setup():
 
 setup()
 while True:
-    window.fill(WHITE)
+    app.background(255)
+    app.fill(0)
     step()
     drawBonds()
     drawCells()
-    pygame.display.update()
-    frameRate.tick(FPS)
+    app.redraw()
