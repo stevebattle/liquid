@@ -16,14 +16,15 @@
 # Plots inspired by: https://scipy-cookbook.readthedocs.io/items/LoktaVolterraTutorial.html
 
 from inspect import _void
-from math import cos, sin, pi, hypot
+from math import cos, sin, pi, hypot, sqrt, atan
 import random
 from Box2D.examples.framework import (Framework, Keys, main)
 from Box2D import (b2World, b2DistanceJointDef, b2PrismaticJointDef, b2WheelJointDef, b2EdgeShape, b2FixtureDef, b2PolygonShape, b2CircleShape)
 import pylab as p
 import numpy as np
-import time
-from scipy.sparse import lil_matrix 
+from time import time
+from scipy.sparse import lil_matrix
+from scipy.stats import norm
 
 N = 700
 
@@ -33,12 +34,20 @@ OFFSETY = 15
 SIDE = 30
 
 # body characteristics
-SUB_RADIUS = 0.5
-CAT_SIDE = 1.6
-LINK_SIDE = 0.9
-DENSITY = 4
+MASS = 5
 FRICTION = 0.2
-DECAY_RATE = 0.0005
+S_RADIUS = 0.5
+K_SIDE = 1.6
+L_SIDE = 0.9
+K_AREA = K_SIDE * sqrt(3)/4 # area of equilateral triangle
+S_AREA = pi * S_RADIUS**2 # area of circle
+L_AREA = L_SIDE**2 # area of square
+
+DECAY_RATE = 0.001
+CENTERING = 8
+
+# Wiener Process parameter
+DELTA = 15
 
 # plot
 SAMPLES = 500 # must be >= W
@@ -50,17 +59,30 @@ plotL = []
 plotJ = []
 plotX = []
 step = 0
-t0 = time.time()
+t0 = time()
 fig1 = None
 fig2 = None
-W = 20
-DIM = 30 # dimension of sparse array for plot
+W = 20 # moving average 'window'
+DIM = 50 # dimension of sparse array for plot
+
+lastTime = time()
 
 def triangle(r):
     return [(r,0),(r*cos(4*pi/3),r*sin(4*pi/3)),(r*cos(2*pi/3),r*sin(2*pi/3))]
 
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
+
+class Autopoiesis(Framework):
+    name = "Autopoiesis"
+    description = "Simulated Autopoiesis in Liquid Automata"
+    bodies = []
+    joints = []
+
+    # the current set of catalyst contacts
+    contacts = set()
+    reserve = []
+    bonds = []
 
 class Autopoiesis(Framework):
     name = "Autopoiesis"
@@ -89,39 +111,41 @@ class Autopoiesis(Framework):
                     ])
 
         # A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
-        sub = b2FixtureDef(shape=b2CircleShape(radius=SUB_RADIUS), density=DENSITY, friction=FRICTION)
-        cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(CAT_SIDE)), density=DENSITY, friction=FRICTION)
-        link = b2FixtureDef(shape=b2PolygonShape(box=(LINK_SIDE,LINK_SIDE)), density=DENSITY, friction=FRICTION, userData="link")
+        sub = b2FixtureDef(shape=b2CircleShape(radius=S_RADIUS), density=MASS/S_AREA, friction=FRICTION)
+        cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(K_SIDE)), density=MASS/K_AREA, friction=FRICTION)
+        link = b2FixtureDef(shape=b2PolygonShape(box=(L_SIDE,L_SIDE)), density=2*MASS/L_AREA, friction=FRICTION, userData="link")
 
         # The N body problem
         self.bodies = [ self.world.CreateDynamicBody(position=(OFFSETX,OFFSETY),fixtures=cat, userData="cat") ]
         for i in range(N):
-            p = (random.randrange(round(-SIDE/2+OFFSETX+SUB_RADIUS*2),round(SIDE/2+OFFSETX-SUB_RADIUS*2)),
-                 random.randrange(round(-SIDE/2+OFFSETY+SUB_RADIUS*2),round(SIDE/2+OFFSETY-SUB_RADIUS*2)))
+            p = (random.randrange(round(-SIDE/2+OFFSETX+S_RADIUS*2),round(SIDE/2+OFFSETX-S_RADIUS*2)),
+                 random.randrange(round(-SIDE/2+OFFSETY+S_RADIUS*2),round(SIDE/2+OFFSETY-S_RADIUS*2)))
             b = self.world.CreateDynamicBody(position=p,fixtures=sub, userData="sub")
             b.angle = random.uniform(0,2*pi)
             self.bodies.append(b)
 
         bodies = self.bodies
 
+
     def Step(self, settings):
-        global link, sub, step, plotS, plotL, plotJ, plotX, fig1, countS, countL, countJ, t0
+        global link, sub, lastTime, step, plotS, plotL, plotJ, plotX, fig1, countS, countL, countJ, t0
+
         super(Autopoiesis, self).Step(settings)
+
+        # determine dt by the clock
+        timeNow = time()
+        dt = timeNow - lastTime
+        lastTime = timeNow
+
         for body in self.bodies:
-            # Apply random 'brownian' forces to substrate at each step
-            if body.userData=="sub":
-                # Random angle change 'Brownian motion'
-                body.angle += random.uniform(-0.3,0.3)
-                w = 1
-                force = (w*cos(body.angle), w*sin(body.angle))
-                body.ApplyLinearImpulse(force,body.position, True)
+            # Apply random 'brownian' forces (Wiener process) to substrate at each step
+            # see https://scipy-cookbook.readthedocs.io/items/BrownianMotion.html
+            force = (norm.rvs(scale=DELTA**2*dt), norm.rvs(scale=DELTA**2*dt))
+            body.ApplyLinearImpulse(force,body.position, True)
                 
-            # catalyst tends to the origin
-            elif body.userData=="cat":
-                body.angle += random.uniform(-0.3,0.3)
-                # Pressure towards origin to avoid being trapped against the wall
-                w = 8
-                force = (-w*(body.position[0]-OFFSETX),-w*(body.position[1]-OFFSETY))
+            # catalyst pressure towards origin to avoid being trapped against the wall
+            if body.userData=="cat":
+                force = (-CENTERING*(body.position[0]-OFFSETX),-CENTERING*(body.position[1]-OFFSETY))
                 body.ApplyForce(force,body.position, True)
         
         # composition: K + 2S -> K + L
@@ -188,8 +212,8 @@ class Autopoiesis(Framework):
                     countS += 2
 
         # sample data once per second
-        if time.time()>t0+1 and fig1==None:
-            t0 = time.time()
+        if time()>t0+1 and fig1==None:
+            t0 = time()
             plotS.append(countS)
             plotL.append(countL)
             plotJ.append(countJ)
@@ -198,6 +222,7 @@ class Autopoiesis(Framework):
             print(step)
 
         if step == SAMPLES and fig1==None:
+
             fig1 = p.figure()
             # A long average 20-30 secs highlights the L,J lag.
             s = moving_average(np.diff(plotS),W)
@@ -205,9 +230,9 @@ class Autopoiesis(Framework):
             j = moving_average(np.diff(plotJ),W)
             n = min(len(s),100) # plot at most 100 samples
             t = plotX[:n]
-            p.plot(t, s[:n], 'r-', label='Substrate')
-            p.plot(t, l[:n], 'g-', label='Links')
-            p.plot(t, j[:n], 'b-', label='Joints')
+            p.plot(t, s[:n], 'r-', label='substrate')
+            p.plot(t, l[:n], 'g-', label='links')
+            p.plot(t, j[:n], 'b-', label='joints')
             p.legend(loc='best')
             p.xlabel('time')
             p.ylabel('rate of change ('+str(W)+' sec moving avg)')
@@ -220,7 +245,6 @@ class Autopoiesis(Framework):
             dx = np.diff(x)
             dy = np.diff(y)
             n = len(dx)
-
             sumx = lil_matrix((DIM, DIM))
             sumy =  lil_matrix((DIM, DIM))
             sumn =  lil_matrix((DIM, DIM))
@@ -246,9 +270,24 @@ class Autopoiesis(Framework):
             M = np.ones(len(_x))
             p.quiver(_x,_y,_dx,_dy,M,pivot='mid', cmap=p.cm.jet)
             p.grid()
-            p.xlabel('Joints')
-            p.ylabel('Substrate')
+            p.xlabel('$\Delta$ joints')
+            p.ylabel('$\Delta$ substrate')
             fig2.savefig('fig2.png')
+
+            n = min(SAMPLES,100) # plot at most 100 samples
+            t = plotX[:n]
+            fig3, ax1 = p.subplots()
+            ax2 = ax1.twinx()
+            ax1.plot(t, plotS[:n], label='substrate', color='red')
+            ax2.plot(t, plotL[:n], label='links', color='green')
+            ax2.plot(t, plotJ[:n], label='joints', color='blue')
+            ax1.set_xlabel('time')
+            ax1.set_ylabel('substrate')
+            ax2.set_ylabel('links and joints')
+            fig3.legend(loc='upper left')
+            #fig3.tight_layout()
+            p.grid()
+            fig3.savefig('fig3.png')
 
     def BeginContact(self,contact):
         # Add new catalyst contacts (removed in EndContact below)

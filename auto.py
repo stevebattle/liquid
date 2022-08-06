@@ -27,23 +27,25 @@ OFFSETY = 15
 SIDE = 30
 
 # body characteristics
-SUB_RADIUS = 0.5
-CAT_SIDE = 1.6
-LINK_SIDE = 0.9
-DENSITY = 4
+MASS = 5
 FRICTION = 0.2
-DECAY_RATE = 0.0005
+S_RADIUS = 0.5
+K_SIDE = 1.6
+L_SIDE = 0.9
+K_AREA = K_SIDE * sqrt(3)/4 # area of equilateral triangle
+S_AREA = pi * S_RADIUS**2 # area of circle
+L_AREA = L_SIDE**2 # area of square
 
-# Wiener Process 
+DECAY_RATE = 0.001
+CENTERING = 8
+
+# Wiener Process parameter
 DELTA = 15
 
 lastTime = time()
 
 def triangle(r):
     return [(r,0),(r*cos(4*pi/3),r*sin(4*pi/3)),(r*cos(2*pi/3),r*sin(2*pi/3))]
-
-def handleCollision(phase, a, b, arbiter):
-    pass
 
 class Autopoiesis(Framework):
     name = "Autopoiesis"
@@ -63,7 +65,7 @@ class Autopoiesis(Framework):
         # weightless world
         self.world.gravity = (0, 0)
 
-        # confinement field
+        # containment field
         border = self.world.CreateStaticBody(
             shapes=[b2EdgeShape(vertices=[(-SIDE/2+OFFSETX, -SIDE/2+OFFSETY), (SIDE/2+OFFSETX, -SIDE/2+OFFSETY)]),
                     b2EdgeShape(vertices=[(-SIDE/2+OFFSETX, -SIDE/2+OFFSETY), (-SIDE/2+OFFSETX, SIDE/2+OFFSETY)]),
@@ -72,15 +74,15 @@ class Autopoiesis(Framework):
                     ])
 
         # A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
-        sub = b2FixtureDef(shape=b2CircleShape(radius=SUB_RADIUS), density=DENSITY, friction=FRICTION)
-        cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(CAT_SIDE)), density=DENSITY, friction=FRICTION)
-        link = b2FixtureDef(shape=b2PolygonShape(box=(LINK_SIDE,LINK_SIDE)), density=DENSITY, friction=FRICTION, userData="link")
+        sub = b2FixtureDef(shape=b2CircleShape(radius=S_RADIUS), density=MASS/S_AREA, friction=FRICTION)
+        cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(K_SIDE)), density=MASS/K_AREA, friction=FRICTION)
+        link = b2FixtureDef(shape=b2PolygonShape(box=(L_SIDE,L_SIDE)), density=2*MASS/L_AREA, friction=FRICTION, userData="link")
 
         # The N body problem
         self.bodies = [ self.world.CreateDynamicBody(position=(OFFSETX,OFFSETY),fixtures=cat, userData="cat") ]
         for i in range(N):
-            p = (random.randrange(round(-SIDE/2+OFFSETX+SUB_RADIUS*2),round(SIDE/2+OFFSETX-SUB_RADIUS*2)),
-                 random.randrange(round(-SIDE/2+OFFSETY+SUB_RADIUS*2),round(SIDE/2+OFFSETY-SUB_RADIUS*2)))
+            p = (random.randrange(round(-SIDE/2+OFFSETX+S_RADIUS*2),round(SIDE/2+OFFSETX-S_RADIUS*2)),
+                 random.randrange(round(-SIDE/2+OFFSETY+S_RADIUS*2),round(SIDE/2+OFFSETY-S_RADIUS*2)))
             b = self.world.CreateDynamicBody(position=p,fixtures=sub, userData="sub")
             b.angle = random.uniform(0,2*pi)
             self.bodies.append(b)
@@ -104,8 +106,7 @@ class Autopoiesis(Framework):
                 
             # catalyst pressure towards origin to avoid being trapped against the wall
             if body.userData=="cat":
-                w = 8
-                force = (-w*(body.position[0]-OFFSETX),-w*(body.position[1]-OFFSETY))
+                force = (-CENTERING*(body.position[0]-OFFSETX),-CENTERING*(body.position[1]-OFFSETY))
                 body.ApplyForce(force,body.position, True)
         
         # composition: K + 2S -> K + L
@@ -121,7 +122,7 @@ class Autopoiesis(Framework):
             c1.DestroyFixture(c1.fixtures[0])
             self.reserve.append(c1)
 
-        # concatenation: L<sub>n</sub> + L -> L<sub>n+1</sub>
+        # concatenation: L<super>n</super> + L -> L<super>n+1</super>
         # bond links together
         for b in self.bonds:
             bodyA = b.fixtureA.body
