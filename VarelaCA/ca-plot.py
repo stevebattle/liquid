@@ -2,45 +2,48 @@
 
 # Simulated Autopoiesis in Liquid Automata
 # To run:
-# conda activate pybox2d
-# python plot.py
+# python plot-ca.py
 
+import pygame
+from pygame.locals import *
 import pylab as p
 import numpy as np
-from time import time
-from auto import Autopoiesis
+from scipy.sparse import lil_matrix
+from ca import CA
 
-S_POP = 700 # substrate population
+SIDE = 400
 W = 20 # moving average 'window'
 SAMPLES = 100 # must be >= W
+CATALYSTS = [(4,4)] # (x,y)
+
+# pygame color objects
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
 plotS = []
 plotL = []
 plotJ = []
 plotX = []
-t0 = time()
 
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
-class Plot(Autopoiesis):
-    def __init__(self,N):
-        super(Plot, self).__init__(N)
+class Plot(CA):
+    def __init__(self,C):
+        super(Plot, self).__init__(C)
         self.step = 0
 
-    def Step(self, settings):
-        global t0, plotS, plotL, plotJ, plotX
-        super(Plot, self).Step(settings)
+    def Step(self):
+        global plotS, plotL, plotJ, plotX
+        super(Plot, self).Step()
 
-        # sample data once per second
-        if time()>t0+1:
-            t0 = time()
-            plotS.append(self.countS)
-            plotL.append(self.countL)
-            plotJ.append(self.countJ)
-            plotX.append(self.step)
-            self.step += 1
-            print(self.step)
+
+        plotS.append(self.countS)
+        plotL.append(self.countL)
+        plotJ.append(self.countJ)
+        plotX.append(self.step)
+        self.step += 1
+        print(self.step)
 
         if self.step==SAMPLES+W:
             n = SAMPLES
@@ -75,5 +78,19 @@ class Plot(Autopoiesis):
 
             exit()
 
-if __name__ == "__main__":
-    Plot(S_POP).run()
+pygame.init()
+window = pygame.display.set_mode((SIDE,SIDE))
+FPS = 20
+frameRate = pygame.time.Clock()
+
+ca = Plot(CATALYSTS)
+while True:
+    window.fill(WHITE)
+    ca.Step()
+    ca.draw()
+    pygame.display.update()
+    # check for quit
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit()
+    frameRate.tick(FPS)
