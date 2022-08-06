@@ -17,13 +17,13 @@ from scipy.stats import norm
 import random
 from time import time
 from Box2D.examples.framework import (Framework, Keys, main)
-from Box2D import (b2World, b2DistanceJointDef, b2PrismaticJointDef, b2WheelJointDef, b2EdgeShape, b2FixtureDef, b2PolygonShape, b2CircleShape)
+from Box2D import *
 
 S_POP = 700
 
 # Arena dimensions/offsets
-OFFSETX = 0
-OFFSETY = 15
+OFFX = 0
+OFFY = 15
 SIDE = 30
 
 # body characteristics
@@ -70,22 +70,23 @@ class Autopoiesis(Framework):
 
         # containment field
         border = self.world.CreateStaticBody(
-            shapes=[b2EdgeShape(vertices=[(-SIDE/2+OFFSETX, -SIDE/2+OFFSETY), (SIDE/2+OFFSETX, -SIDE/2+OFFSETY)]),
-                    b2EdgeShape(vertices=[(-SIDE/2+OFFSETX, -SIDE/2+OFFSETY), (-SIDE/2+OFFSETX, SIDE/2+OFFSETY)]),
-                    b2EdgeShape(vertices=[(SIDE/2+OFFSETX, -SIDE/2+OFFSETY), (SIDE/2+OFFSETX, SIDE/2+OFFSETY)]),
-                    b2EdgeShape(vertices=[(-SIDE/2+OFFSETX, SIDE/2+OFFSETY), (SIDE/2+OFFSETX, SIDE/2+OFFSETY)]),
+            shapes=[b2EdgeShape(vertices=[(-SIDE/2+OFFX, -SIDE/2+OFFY), (SIDE/2+OFFX, -SIDE/2+OFFY)]),
+                    b2EdgeShape(vertices=[(-SIDE/2+OFFX, -SIDE/2+OFFY), (-SIDE/2+OFFX, SIDE/2+OFFY)]),
+                    b2EdgeShape(vertices=[(SIDE/2+OFFX, -SIDE/2+OFFY), (SIDE/2+OFFX, SIDE/2+OFFY)]),
+                    b2EdgeShape(vertices=[(-SIDE/2+OFFX, SIDE/2+OFFY), (SIDE/2+OFFX, SIDE/2+OFFY)]),
                     ])
 
         # A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
+        # The components are ranked by increasing 'mass' as S, L, K.
         sub = b2FixtureDef(shape=b2CircleShape(radius=S_RADIUS), density=MASS/S_AREA, friction=FRICTION)
-        cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(K_SIDE)), density=MASS/K_AREA, friction=FRICTION)
         link = b2FixtureDef(shape=b2PolygonShape(box=(L_SIDE,L_SIDE)), density=2*MASS/L_AREA, friction=FRICTION, userData="link")
+        cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(K_SIDE)), density=3*MASS/K_AREA, friction=FRICTION)
 
         # The N body problem
-        self.bodies = [ self.world.CreateDynamicBody(position=(OFFSETX,OFFSETY),fixtures=cat, userData="cat") ]
+        self.bodies = [ self.world.CreateDynamicBody(position=(OFFX,OFFY),fixtures=cat, userData="cat") ]
         for i in range(n):
-            p = (random.randrange(round(-SIDE/2+OFFSETX+S_RADIUS*2),round(SIDE/2+OFFSETX-S_RADIUS*2)),
-                 random.randrange(round(-SIDE/2+OFFSETY+S_RADIUS*2),round(SIDE/2+OFFSETY-S_RADIUS*2)))
+            p = (random.randrange(round(-SIDE/2+OFFX+S_RADIUS*2),round(SIDE/2+OFFX-S_RADIUS*2)),
+                 random.randrange(round(-SIDE/2+OFFY+S_RADIUS*2),round(SIDE/2+OFFY-S_RADIUS*2)))
             b = self.world.CreateDynamicBody(position=p,fixtures=sub, userData="sub")
             b.angle = random.uniform(0,2*pi)
             self.bodies.append(b)
@@ -110,7 +111,7 @@ class Autopoiesis(Framework):
                 
             # catalyst pressure towards origin to avoid being trapped against the wall
             if body.userData=="cat":
-                force = (-CENTERING*(body.position[0]-OFFSETX),-CENTERING*(body.position[1]-OFFSETY))
+                force = (-CENTERING*(body.position[0]-OFFX),-CENTERING*(body.position[1]-OFFY))
                 body.ApplyForce(force,body.position, True)
         
         # composition: K + 2S -> K + L
