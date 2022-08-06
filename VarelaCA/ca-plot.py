@@ -8,7 +8,6 @@ import pygame
 from pygame.locals import *
 import pylab as p
 import numpy as np
-from scipy.sparse import lil_matrix
 from ca import CA
 
 SIDE = 400
