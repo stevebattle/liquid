@@ -19,7 +19,7 @@ from time import time
 from Box2D.examples.framework import (Framework, Keys, main)
 from Box2D import (b2World, b2DistanceJointDef, b2PrismaticJointDef, b2WheelJointDef, b2EdgeShape, b2FixtureDef, b2PolygonShape, b2CircleShape)
 
-N = 700
+S_POP = 700
 
 # Arena dimensions/offsets
 OFFSETX = 0
@@ -42,8 +42,6 @@ CENTERING = 8
 # Wiener Process parameter
 DELTA = 15
 
-lastTime = time()
-
 def triangle(r):
     return [(r,0),(r*cos(4*pi/3),r*sin(4*pi/3)),(r*cos(2*pi/3),r*sin(2*pi/3))]
 
@@ -58,9 +56,14 @@ class Autopoiesis(Framework):
     reserve = []
     bonds = []
 
-    def __init__(self):
-        global link, sub
+    def __init__(self,n):
+        global cat, link, sub
         super(Autopoiesis, self).__init__()
+
+        self.countS = 0
+        self.countL = 0
+        self.countJ = 0
+        self.lastTime = time()
 
         # weightless world
         self.world.gravity = (0, 0)
@@ -80,23 +83,24 @@ class Autopoiesis(Framework):
 
         # The N body problem
         self.bodies = [ self.world.CreateDynamicBody(position=(OFFSETX,OFFSETY),fixtures=cat, userData="cat") ]
-        for i in range(N):
+        for i in range(n):
             p = (random.randrange(round(-SIDE/2+OFFSETX+S_RADIUS*2),round(SIDE/2+OFFSETX-S_RADIUS*2)),
                  random.randrange(round(-SIDE/2+OFFSETY+S_RADIUS*2),round(SIDE/2+OFFSETY-S_RADIUS*2)))
             b = self.world.CreateDynamicBody(position=p,fixtures=sub, userData="sub")
             b.angle = random.uniform(0,2*pi)
             self.bodies.append(b)
+            self.countS += 1
 
         bodies = self.bodies
 
     def Step(self, settings):
-        global link, sub, lastTime
+        global link, sub, lastTime, countS, countL, countJ
         super(Autopoiesis, self).Step(settings)
 
         # determine dt using the clock
         timeNow = time()
-        dt = timeNow - lastTime
-        lastTime = timeNow
+        dt = timeNow - self.lastTime
+        self.lastTime = timeNow
 
         for body in self.bodies:
             # Apply random 'brownian' forces (Wiener process) to substrate at each step
@@ -121,6 +125,8 @@ class Autopoiesis(Framework):
             c1 = self.contacts.pop()
             c1.DestroyFixture(c1.fixtures[0])
             self.reserve.append(c1)
+            self.countS -= 2
+            self.countL += 1
 
         # concatenation: L<super>n</super> + L -> L<super>n+1</super>
         # bond links together
@@ -137,6 +143,7 @@ class Autopoiesis(Framework):
                 self.joints.append(j)
                 bodyA.userData += 1
                 bodyB.userData += 1
+                self.countJ += 1
         self.bonds = []
 
         # disintegration:  L -> 2S
@@ -161,10 +168,14 @@ class Autopoiesis(Framework):
                             j.bodyA.userData -= 1
                         self.joints.remove(j)
                         self.world.DestroyJoint(j)
+                        self.countJ -= 1
+
                     # restore the second sub from the reserve
                     s = self.reserve.pop()
                     s.CreateFixture(sub)
                     s.position = b.position
+                    self.countL -= 1
+                    self.countS += 2
 
     def BeginContact(self,contact):
         # Add new catalyst contacts (removed in EndContact below)
@@ -186,4 +197,4 @@ class Autopoiesis(Framework):
             self.contacts.remove(contact.fixtureA.body)
 
 if __name__ == "__main__":
-    main(Autopoiesis)
+    Autopoiesis(S_POP).run()
