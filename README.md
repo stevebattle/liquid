@@ -47,4 +47,5 @@ Tommaso Toffoli, Symbol Super Colliders, in Collision-Based Computing, Andrew Ad
 Kurt W. Fleischer, A Multiple-Mechanism Developmental Model for Defining Self-Organizing Geometric Structures, California Institute of Technology, 1995  
 Randall D Beer, Characterizing autopoiesis in the game of life, Artif Life. 2015 Winter;21(1):1-19. doi: 10.1162/ARTL_a_00143.  
 Andrew Adamatzky, Towards fungal computer, Interface Focus, The Royal Society Publishing, 2018. http://doi.org/10.1098/rsfs.2018.0029  
-Yokomori, T., Okubo, F. Theory of reaction automata: a survey. J Membr Comput 3, 63–85 2021. https://doi.org/10.1007/s41965-021-00070-6  
+Yokomori, T., Okubo, F. Theory of reaction automata: a survey. J Membr Comput 3, 63–85 2021. https://doi.org/10.1007/s41965-021-00070-6
+Barry McMullin and Francisco J. Varela, "Rediscovering Computational Autopoiesis," in Fourth European Conference on Artificial Life, ed. Phil Husbands and Inman Harvey (Cambridge, Mass. : The MIT Press, 1997), 38-47

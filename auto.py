@@ -6,11 +6,6 @@
 # conda activate pybox2d
 # python -m auto --backend=pygame
 
-# K - catalyst
-# S - substrate
-# L - link
-# BL - bonded link
-
 from inspect import _void
 from math import cos, sin, pi, sqrt, atan
 from scipy.stats import norm
@@ -40,10 +35,22 @@ DECAY_RATE = 0.001
 CENTERING = 8
 
 # Wiener Process parameter
-DELTA = 15
+DELTA = 20
+
+# A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
+# The components are ranked by increasing 'mass' as S, L, K.
 
 def triangle(r):
     return [(r,0),(r*cos(4*pi/3),r*sin(4*pi/3)),(r*cos(2*pi/3),r*sin(2*pi/3))]
+
+# K - catalyst
+# S - substrate
+# L - link
+# BL - bonded link
+S = b2FixtureDef(shape=b2CircleShape(radius=S_RADIUS), density=MASS/S_AREA, friction=FRICTION, userData="S")
+L = b2FixtureDef(shape=b2PolygonShape(box=(L_SIDE,L_SIDE)), density=2*MASS/L_AREA, friction=FRICTION, userData="L")
+K = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(K_SIDE)), density=3*MASS/K_AREA, friction=FRICTION, userData="K")
+
 
 class Autopoiesis(Framework):
     name = "Autopoiesis"
@@ -56,14 +63,15 @@ class Autopoiesis(Framework):
     reserve = []
     bonds = []
 
-    def __init__(self,n):
-        global cat, link, sub
+    def __init__(self,n=S_POP,delta=DELTA):
+        global S,L,K
         super(Autopoiesis, self).__init__()
 
         self.countS = 0
         self.countL = 0
         self.countJ = 0
         self.lastTime = time()
+        self.delta = delta # Wiener process
 
         # weightless world
         self.world.gravity = (0, 0)
@@ -76,26 +84,30 @@ class Autopoiesis(Framework):
                     b2EdgeShape(vertices=[(-SIDE/2+OFFX, SIDE/2+OFFY), (SIDE/2+OFFX, SIDE/2+OFFY)]),
                     ])
 
-        # A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
-        # The components are ranked by increasing 'mass' as S, L, K.
-        sub = b2FixtureDef(shape=b2CircleShape(radius=S_RADIUS), density=MASS/S_AREA, friction=FRICTION)
-        link = b2FixtureDef(shape=b2PolygonShape(box=(L_SIDE,L_SIDE)), density=2*MASS/L_AREA, friction=FRICTION, userData="link")
-        cat = b2FixtureDef(shape=b2PolygonShape(vertices=triangle(K_SIDE)), density=3*MASS/K_AREA, friction=FRICTION)
-
         # The N body problem
-        self.bodies = [ self.world.CreateDynamicBody(position=(OFFX,OFFY),fixtures=cat, userData="cat") ]
+        self.bodies = [ self.world.CreateDynamicBody(position=(OFFX,OFFY),fixtures=K) ]
         for i in range(n):
             p = (random.randrange(round(-SIDE/2+OFFX+S_RADIUS*2),round(SIDE/2+OFFX-S_RADIUS*2)),
                  random.randrange(round(-SIDE/2+OFFY+S_RADIUS*2),round(SIDE/2+OFFY-S_RADIUS*2)))
-            b = self.world.CreateDynamicBody(position=p,fixtures=sub, userData="sub")
+            b = self.world.CreateDynamicBody(position=p,fixtures=S)
             b.angle = random.uniform(0,2*pi)
             self.bodies.append(b)
             self.countS += 1
 
         bodies = self.bodies
 
+    # eliminates triangular compositions
+    def acute(self,bodyA,bodyB):
+        a = [i.bodyB for i in self.joints if i.bodyA==bodyA] + \
+            [j.bodyA for j in self.joints if j.bodyB==bodyA]
+        b = [i.bodyB for i in self.joints if i.bodyA==bodyB] + \
+            [j.bodyA for j in self.joints if j.bodyB==bodyB]
+        # list intersection
+        intersect = [i for i in a if i in b]
+        return len(intersect)>0
+
     def Step(self, settings):
-        global link, sub, lastTime, countS, countL, countJ
+        global S, L, lastTime, countS, countL, countJ
         super(Autopoiesis, self).Step(settings)
 
         # determine dt using the clock
@@ -104,25 +116,26 @@ class Autopoiesis(Framework):
         self.lastTime = timeNow
 
         for body in self.bodies:
-            # Apply random 'brownian' forces (Wiener process) to substrate at each step
-            # see https://scipy-cookbook.readthedocs.io/items/BrownianMotion.html
-            force = (norm.rvs(scale=DELTA**2*dt), norm.rvs(scale=DELTA**2*dt))
-            body.ApplyLinearImpulse(force,body.position, True)
-                
-            # catalyst pressure towards origin to avoid being trapped against the wall
-            if body.userData=="cat":
-                force = (-CENTERING*(body.position[0]-OFFX),-CENTERING*(body.position[1]-OFFY))
-                body.ApplyForce(force,body.position, True)
+            if len(body.fixtures)==1:
+                # Apply random 'brownian' forces (Wiener process) to substrate at each step
+                # see https://scipy-cookbook.readthedocs.io/items/BrownianMotion.html
+                force = (norm.rvs(scale=self.delta**2*dt), norm.rvs(scale=self.delta**2*dt))
+                body.ApplyLinearImpulse(force,body.position, True)
+                    
+                # catalyst pressure towards origin to avoid being trapped against the wall
+                if body.fixtures[0].userData=="K":
+                    force = (-CENTERING*(body.position[0]-OFFX),-CENTERING*(body.position[1]-OFFY))
+                    body.ApplyForce(force,body.position, True)
         
         # composition: K + 2S -> K + L
         # convert substrate pair to link
         if len(self.contacts)>=2:
-            # convert the first sub into a link
+            # convert the first substrate into a link
             c = self.contacts.pop()
-            c.userData = 0
             c.DestroyFixture(c.fixtures[0])
-            c.CreateFixture(link)
-            # put the second sub on the reserve list (we need it for decay)
+            c.CreateFixture(L)
+            c.userData = 0 # bond counter
+            # put the second substrate on the reserve list (we need it for decay)
             c1 = self.contacts.pop()
             c1.DestroyFixture(c1.fixtures[0])
             self.reserve.append(c1)
@@ -134,8 +147,8 @@ class Autopoiesis(Framework):
         for b in self.bonds:
             bodyA = b.fixtureA.body
             bodyB = b.fixtureB.body
-            if type(bodyA.userData)==int and bodyA.userData<2 and \
-               type(bodyB.userData)==int and bodyB.userData<2:
+            if b.fixtureA.userData=="L" and bodyA.userData<2 and \
+               b.fixtureB.userData=="L" and bodyB.userData<2 and not(self.acute(bodyA,bodyB)):
                 j = self.world.CreateJoint(b2DistanceJointDef(
                     frequencyHz=4.0, dampingRatio=0.5,
                     bodyA=bodyA, bodyB=bodyB,
@@ -150,52 +163,52 @@ class Autopoiesis(Framework):
         # disintegration:  L -> 2S
         # random decay of links and bonds
         for b in self.bodies:
-            # links have userData = 0, bonded links have userData = 1,2
-            if type(b.userData)==int:
+            # links have a single fixture with userData = "L"
+            if len(b.fixtures)==1 and b.fixtures[0].userData=="L":
                 if random.uniform(0,1) < DECAY_RATE:
-                    b.userData = "sub"
                     # destroy the link fixture and replace it with a substrate fixture
                     b.DestroyFixture(b.fixtures[0])
-                    b.CreateFixture(sub)
+                    b.CreateFixture(S)
                     # now delete any associated joints
                     joints2go = []
                     for j in self.joints:
                         if j.bodyA == b or j.bodyB == b:
                             joints2go.append(j)
                     for j in joints2go:
-                        if j.bodyA == b:
+                        if j.bodyA == b and isinstance(j.bodyB.userData, int):
                             j.bodyB.userData -= 1
-                        if j.bodyB == b:
+                        if j.bodyB == b and isinstance(j.bodyA.userData, int):
                             j.bodyA.userData -= 1
                         self.joints.remove(j)
                         self.world.DestroyJoint(j)
                         self.countJ -= 1
 
-                    # restore the second sub from the reserve
+                    # restore the second substrate from the reserve
                     s = self.reserve.pop()
-                    s.CreateFixture(sub)
+                    s.CreateFixture(S)
                     s.position = b.position
                     self.countL -= 1
                     self.countS += 2
 
     def BeginContact(self,contact):
         # Add new catalyst contacts (removed in EndContact below)
-        if contact.fixtureA.body.userData=="cat" and contact.fixtureB.body.userData=="sub":
+        if contact.fixtureA.userData=="K" and contact.fixtureB.userData=="S":
             self.contacts.add(contact.fixtureB.body)
-        elif contact.fixtureB.body.userData=="cat" and contact.fixtureA.body.userData=="sub":
+        elif contact.fixtureB.userData=="K" and contact.fixtureA.userData=="S":
             self.contacts.add(contact.fixtureA.body)
 
         # Add new bond
-        if type(contact.fixtureA.body.userData)==int and contact.fixtureA.body.userData<2 and \
-           type(contact.fixtureB.body.userData)==int and contact.fixtureB.body.userData<2:
+        if contact.fixtureA.userData=="L" and contact.fixtureA.body.userData<2 and \
+           contact.fixtureB.userData=="L" and contact.fixtureB.body.userData<2:
             self.bonds.append(contact)
 
     def EndContact(self,contact):
         # The bodies may have already been removed by catalysis
-        if contact.fixtureA.body.userData=="cat" and contact.fixtureB.body in self.contacts:
+        if contact.fixtureA.userData=="K" and contact.fixtureB.body in self.contacts:
             self.contacts.remove(contact.fixtureB.body)
-        elif contact.fixtureB.body.userData=="cat" and contact.fixtureB.body in self.contacts:
+        elif contact.fixtureB.userData=="K" and contact.fixtureB.body in self.contacts:
             self.contacts.remove(contact.fixtureA.body)
 
+
 if __name__ == "__main__":
-    Autopoiesis(S_POP).run()
+    main(Autopoiesis).run()

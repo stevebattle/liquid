@@ -22,7 +22,7 @@ WHITE = (255, 255, 255)
 
 pygame.init()
 window = pygame.display.set_mode((SIDE,SIDE))
-FPS = 2
+FPS = 10
 frameRate = pygame.time.Clock()
 
 
@@ -65,6 +65,7 @@ class Vector:
     def __eq__(self,other):
         return self.x==other.x and self.y==other.y
 
+# Moore Neighbourhood
 # Local neighbourhood N of adjacent cells (including diagonally adjacent)
 # Designation of coordinates of neighboring space with reference to a middle space with designation 0.
 
@@ -302,6 +303,7 @@ class CA:
                     if self.moveL(ni,h,False): # L displaced according to the rules of 2.3 (no exchange leaves ni free)
                         self.setCell(ni, self.cell(c[i])) # K moved into its place
                         self.setCell(c[i], None)
+                        self.bonding(h) # Bond the moved L if possible
                         moved = True
                         break
                     
@@ -315,6 +317,7 @@ class CA:
                 swap = self.cell(ni) # displaced L
                 self.setCell(ni, self.cell(c[i])) # motile K
                 self.setCell(c[i], swap)
+                self.bonding(c[i]) # Bond L if possible
                 
             # 3.3.5. If the location specified by n_i is a hole, the K moves into it.
             elif self.cell(ni) is None:
@@ -498,7 +501,7 @@ class CA:
         m = m + [c.add(v) for v in N[1:] if inRange(c,v) and \
             isinstance(self.neighbour(c,v), Link) and len(self.neighbour(c,v).bonds)==0 ]
     
-        # 7.5. Execute steps 7.1 through 7.3; then exit
+        # 7.5. Execute steps 7.1 (7.2) through 7.3; then exit
         p = [ (m[i],m[j]) for i in range(len(m)-1) for j in range(i+1,len(m)) \
             if orthogonallyAdjacent(m[i],m[j]) and not self.bonded(m[i],m[j]) ]
         s = [s for s in powerset(p) for pu in s if not reduce(lambda a,b: a or b, map(lambda x: commonCell(pu, x), s)) ]

@@ -11,18 +11,17 @@ from scipy.sparse import lil_matrix
 from time import time
 from auto import Autopoiesis
 
-S_POP = 700 # substrate population
-W = 20 # moving average 'window'
 SAMPLES = 500 # must be >= W
 DIM = 50 # dimension of sparse array for plot
 
+plotL = []
 plotS = []
 plotJ = []
 t0 = time()
 
 class PhasePlot(Autopoiesis):
-    def __init__(self,N):
-        super(PhasePlot, self).__init__(N)
+    def __init__(self):
+        super(PhasePlot, self).__init__()
         self.step = 0
 
     def Step(self, settings):
@@ -32,6 +31,7 @@ class PhasePlot(Autopoiesis):
         # sample data once per second
         if time()>t0+1:
             t0 = time()
+            plotL.append(self.countL)
             plotS.append(self.countS)
             plotJ.append(self.countJ)
             self.step += 1
@@ -42,7 +42,8 @@ class PhasePlot(Autopoiesis):
             # Fig 3. Phase Plot delta S by delta J
             fig3 = p.figure()
             x = np.diff(plotJ)
-            y = np.diff(plotS)
+            #y = np.diff(plotS)
+            y = np.diff(plotL)
             dx = np.diff(x)
             dy = np.diff(y)
             n = len(dx)
@@ -69,10 +70,11 @@ class PhasePlot(Autopoiesis):
             p.quiver(_x,_y,_dx,_dy,M,pivot='mid', cmap=p.cm.jet)
             p.grid()
             p.xlabel('$\Delta$ joints')
-            p.ylabel('$\Delta$ substrate')
+            #p.ylabel('$\Delta$ substrate')
+            p.ylabel('$\Delta$ Links')
             fig3.savefig('images/fig3.png')
 
             exit()
 
 if __name__ == "__main__":
-    PhasePlot(S_POP).run()
+    PhasePlot().run()

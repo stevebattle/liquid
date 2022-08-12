@@ -9,8 +9,8 @@ import pylab as p
 import numpy as np
 from time import time
 from auto import Autopoiesis
+from Box2D.examples.framework import main
 
-S_POP = 700 # substrate population
 W = 20 # moving average 'window'
 SAMPLES = 100 # must be >= W
 
@@ -24,8 +24,8 @@ def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
 class Plot(Autopoiesis):
-    def __init__(self,N):
-        super(Plot, self).__init__(N)
+    def __init__(self):
+        super(Plot, self).__init__()
         self.step = 0
 
     def Step(self, settings):
@@ -76,4 +76,4 @@ class Plot(Autopoiesis):
             exit()
 
 if __name__ == "__main__":
-    Plot(S_POP).run()
+    main(Plot).run()
