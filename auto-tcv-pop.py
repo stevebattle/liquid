@@ -9,6 +9,7 @@ import numpy as np
 from time import sleep, time
 from auto import Autopoiesis
 
+DELTA = 15
 S_POP = 700 # substrate population
 SAMPLES = 500 # must be >= W
 
@@ -27,8 +28,8 @@ sampleDL = []
 sampleDJ = []
 
 class TCV(Autopoiesis):
-    def __init__(self,N):
-        super(TCV, self).__init__(N)
+    def __init__(self,delta,N):
+        super(TCV, self).__init__(N,delta=delta)
         self.step = 0
 
     def Step(self, settings):
@@ -81,7 +82,7 @@ if __name__ == "__main__":
 
         try:
             sleep(5)
-            TCV(pop).run()
+            TCV(DELTA,pop).run()
 
         except SystemExit:
             run += 1

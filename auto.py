@@ -35,7 +35,7 @@ DECAY_RATE = 0.001
 CENTERING = 8
 
 # Wiener Process parameter
-DELTA = 20
+DELTA = 15
 
 # A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
 # The components are ranked by increasing 'mass' as S, L, K.
@@ -102,7 +102,7 @@ class Autopoiesis(Framework):
             [j.bodyA for j in self.joints if j.bodyB==bodyA]
         b = [i.bodyB for i in self.joints if i.bodyA==bodyB] + \
             [j.bodyA for j in self.joints if j.bodyB==bodyB]
-        # list intersection
+        # list intersection - any body joined to both A and B
         intersect = [i for i in a if i in b]
         return len(intersect)>0
 

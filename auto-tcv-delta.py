@@ -12,7 +12,7 @@ from auto import Autopoiesis
 SAMPLES = 500 # must be >= W
 
 # Wiener Process parameter
-DELTA = 20
+DELTA = 15
 
 dataS = []
 dataL = []
@@ -89,7 +89,7 @@ if __name__ == "__main__":
             run += 1
             delta += 2
             if run>RUNS:
-                print("delta.\tS\tL\tJ\tDelta S")
+                print("delta.\tS\tL\tJ\tDelta S\tDelta L\tDelta J")
                 for i in range(RUNS+1):
                     print("{}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}".format(DELTA+i*2,sampleS[i],sampleL[i],sampleJ[i],sampleDS[i],sampleDL[i],sampleDJ[i]))
                 print("mean\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}".format(np.mean(sampleS[1:]),np.mean(sampleL[1:]),np.mean(sampleJ[1:]),np.mean(sampleDS[1:]),np.mean(sampleDL[1:]),np.mean(sampleDJ[1:])))
