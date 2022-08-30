@@ -314,7 +314,8 @@ def production():
     c = [Vector(j,i) for i in range(SIZE) for j in range(SIZE) if isinstance(a[i][j], Catalyst) ]
     l = []
     for i in range(len(c)):
-        n = [c[i].add(v) for v in N[1:] if isinstance(neighbour(c[i],v), Substrate) ]
+        NHOOD = N[1:] + N_PRIME[1:] # Use extended neighbourhood to achieve results closer to POBA
+        n = [c[i].add(v) for v in NHOOD if isinstance(neighbour(c[i],v), Substrate) ]
         
         # 4.1.1 Delete from the list of n_ij all positions for which neither adjacent neighbor position appears in the list
         # i.e. a 1 must be deleted from the list of n_ij if neither 5 nor 6 appears 
@@ -480,7 +481,7 @@ def rebond(c):
 def step():
     motion()
     motionL()
-    motionK()
+    # motionK()
     production()
     disintegration()
 
@@ -497,6 +498,10 @@ def drawCells():
             if a[i][j] is not None:
                 a[i][j].draw(j*SPACING+MARGIN+EXTENT/2,i*SPACING+MARGIN+EXTENT/2)
 
+def draw():
+    drawBonds()
+    drawCells()
+
 def setup():
     for i in range(SIZE):
         for j in range(SIZE):
@@ -507,6 +512,6 @@ while True:
     app.background(255)
     app.fill(0)
     step()
-    drawBonds()
-    drawCells()
+    draw()
     app.redraw()
+

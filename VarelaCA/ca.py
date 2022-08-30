@@ -24,6 +24,7 @@ pygame.init()
 window = pygame.display.set_mode((SIDE,SIDE))
 FPS = 10
 frameRate = pygame.time.Clock()
+frameCount = 0
 
 
 def inRange(c,n):
@@ -329,10 +330,12 @@ class CA:
 
     def production(self):
         # 4.1 For each catalyst c_i, form a list of the neighboring positions n_ij that are occupied by S's
+        # We interpret neighboring positions to include the extended, prime neighbourhood
         c = [Vector(j,i) for i in range(SIZE) for j in range(SIZE) if isinstance(self.a[i][j], Catalyst) ]
         l = []
+        NHOOD = N[1:] + N_PRIME[1:] # Use prime neighbourhood to achieve results closer to POBA
         for i in range(len(c)):
-            n = [c[i].add(v) for v in N[1:] if isinstance(self.neighbour(c[i],v), Substrate) ]
+            n = [c[i].add(v) for v in NHOOD if isinstance(self.neighbour(c[i],v), Substrate) ]
             
             # 4.1.1 Delete from the list of n_ij all positions for which neither adjacent neighbor position appears in the list
             # i.e. a 1 must be deleted from the list of n_ij if neither 5 nor 6 appears 
@@ -422,9 +425,9 @@ class CA:
         # and the neighboring positions m_i that contain singly bonded L's.
         # all Varela's examples in POBC show an orthologonal bonding neighbourhood N[1:ORTHOGONAL]
         # Alternatively use N[1:] to include diagonally orthogonal cells (but this suffers from crossovers)
-        m = [li.add(v) for v in N[1:ORTHOGONAL] if inRange(li,v) and \
+        m = [li.add(v) for v in N[1:] if inRange(li,v) and \
             isinstance(self.neighbour(li,v), Link) and len(self.neighbour(li,v).bonds)==1 ]
-        n = [li.add(v) for v in N[1:ORTHOGONAL] if inRange(li,v) and \
+        n = [li.add(v) for v in N[1:] if inRange(li,v) and \
             isinstance(self.neighbour(li,v), Link) and len(self.neighbour(li,v).bonds)==0 ]
         
         # 6.2. Drop from the m_i any that would result in a bond angle less that 90 degrees.
@@ -541,6 +544,8 @@ if __name__ == "__main__":
         ca.Step()
         ca.draw()
         pygame.display.update()
+        frameCount += 1
+        #pygame.image.save(window, "frames/frame"+str(frameCount)+".png")
         # check for quit
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

@@ -53,9 +53,9 @@ class Plot(CA):
             sumn =  lil_matrix((DIM, DIM))
             for i in range(n):
                 # index by row, col
-                sumx[y[i]+(DIM/2),x[i]+(DIM/2)] += dx[i]
-                sumy[y[i]+(DIM/2),x[i]+(DIM/2)] += dy[i]
-                sumn[y[i]+(DIM/2),x[i]+(DIM/2)] +=1
+                sumx[round(y[i]+(DIM/2)),round(x[i]+(DIM/2))] += dx[i]
+                sumy[round(y[i]+(DIM/2)),round(x[i]+(DIM/2))] += dy[i]
+                sumn[round(y[i]+(DIM/2)),round(x[i]+(DIM/2))] +=1
             _x = []
             _y = []
             _dx = []

@@ -1,8 +1,11 @@
 pip install pygame
+pip install matplotlib
+pip install scipy
 
 python ca.py
 
 FPS is set to 2, but it can run much faster
+
 
 
 

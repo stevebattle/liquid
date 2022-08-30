@@ -8,13 +8,33 @@
 
 from inspect import _void
 from math import cos, sin, pi, sqrt, atan
+from re import A
 from scipy.stats import norm
 import random
 from time import time
 from Box2D.examples.framework import (Framework, Keys, main)
 from Box2D import *
+import pygame
 
-S_POP = 520
+pygame.init()
+
+L_sounds = [
+    pygame.mixer.Sound("sounds/diamond_1.mp3"), 
+    pygame.mixer.Sound("sounds/diamond_2.mp3"), 
+    pygame.mixer.Sound("sounds/diamond_3.mp3"), 
+    pygame.mixer.Sound("sounds/diamond_4.mp3"),
+    pygame.mixer.Sound("sounds/diamond_5.mp3"),
+    pygame.mixer.Sound("sounds/diamond_6.mp3"),
+    pygame.mixer.Sound("sounds/diamond_7.mp3"),
+    pygame.mixer.Sound("sounds/diamond_8.mp3") ]
+
+S_sound = pygame.mixer.Sound("sounds/crack.mp3")
+BL_sound =  pygame.mixer.Sound("sounds/gravity_change.mp3")
+amoeba_sound = pygame.mixer.Sound("sounds/amoeba.mp3")
+closure_sound = pygame.mixer.Sound("sounds/diamond_key_collect.mp3")
+
+K_POP = 2
+S_POP = 700
 
 # Arena dimensions/offsets
 OFFX = 0
@@ -84,8 +104,13 @@ class Autopoiesis(Framework):
                     b2EdgeShape(vertices=[(-SIDE/2+OFFX, SIDE/2+OFFY), (SIDE/2+OFFX, SIDE/2+OFFY)]),
                     ])
 
+        for i in range(K_POP):
+            p = (random.randrange(round(-SIDE/2+OFFX+S_RADIUS*2),round(SIDE/2+OFFX-S_RADIUS*2)),
+                 random.randrange(round(-SIDE/2+OFFY+S_RADIUS*2),round(SIDE/2+OFFY-S_RADIUS*2)))
+            b = self.world.CreateDynamicBody(position=p,fixtures=K)
+            self.bodies.append(b)
+
         # The N body problem
-        self.bodies = [ self.world.CreateDynamicBody(position=(OFFX,OFFY),fixtures=K) ]
         for i in range(n):
             p = (random.randrange(round(-SIDE/2+OFFX+S_RADIUS*2),round(SIDE/2+OFFX-S_RADIUS*2)),
                  random.randrange(round(-SIDE/2+OFFY+S_RADIUS*2),round(SIDE/2+OFFY-S_RADIUS*2)))
@@ -105,6 +130,23 @@ class Autopoiesis(Framework):
         # list intersection - any body joined to both A and B
         intersect = [i for i in a if i in b]
         return len(intersect)>0
+
+    def joinedTo(self,bodyA):
+        return [i.bodyB for i in self.joints if i.bodyA==bodyA] + \
+            [j.bodyA for j in self.joints if j.bodyB==bodyA]
+    
+    def closure(self,bodyA):
+        a = bodyA
+        b = self.joinedTo(a)
+        while len(b)>0:
+            c = self.joinedTo(b[0])
+            if a in c:
+                c.remove(a)
+            a = b[0]
+            b = c
+            if a==bodyA:
+                return True
+        return False
 
     def Step(self, settings):
         global S, L, lastTime, countS, countL, countJ
@@ -141,6 +183,7 @@ class Autopoiesis(Framework):
             self.reserve.append(c1)
             self.countS -= 2
             self.countL += 1
+            pygame.mixer.Sound.play(L_sounds[random.randint(0,7)])
 
         # concatenation: L<super>n</super> + L -> L<super>n+1</super>
         # bond links together
@@ -158,6 +201,11 @@ class Autopoiesis(Framework):
                 bodyA.userData += 1
                 bodyB.userData += 1
                 self.countJ += 1
+                pygame.mixer.Sound.play(BL_sound)
+                if self.closure(bodyA):
+                    pygame.mixer.Sound.play(closure_sound)
+
+
         self.bonds = []
 
         # disintegration:  L -> 2S
@@ -190,6 +238,9 @@ class Autopoiesis(Framework):
                     self.countL -= 1
                     self.countS += 2
 
+                    pygame.mixer.Sound.play(S_sound)
+
+
     def BeginContact(self,contact):
         # Add new catalyst contacts (removed in EndContact below)
         if contact.fixtureA.userData=="K" and contact.fixtureB.userData=="S":
@@ -211,4 +262,5 @@ class Autopoiesis(Framework):
 
 
 if __name__ == "__main__":
+    pygame.mixer.Sound.play(amoeba_sound,-1)
     main(Autopoiesis).run()

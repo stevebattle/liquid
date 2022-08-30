@@ -3,15 +3,16 @@
 # Simulated Autopoiesis in Liquid Automata
 # To run:
 # conda activate pybox2d
-# python phase-plot.py
+# python auto-phase.py
 
 import pylab as p
 import numpy as np
 from scipy.sparse import lil_matrix
 from time import time
 from auto import Autopoiesis
+from functools import reduce
 
-SAMPLES = 500 # must be >= W
+SAMPLES = 50
 DIM = 50 # dimension of sparse array for plot
 
 plotL = []
@@ -42,8 +43,8 @@ class PhasePlot(Autopoiesis):
             # Fig 3. Phase Plot delta S by delta J
             fig3 = p.figure()
             x = np.diff(plotJ)
-            #y = np.diff(plotS)
-            y = np.diff(plotL)
+            y = np.diff(plotS)
+            #y = np.diff(plotL)
             dx = np.diff(x)
             dy = np.diff(y)
             n = len(dx)
@@ -69,10 +70,13 @@ class PhasePlot(Autopoiesis):
             M = np.ones(len(_x))
             p.quiver(_x,_y,_dx,_dy,M,pivot='mid', cmap=p.cm.jet)
             p.grid()
-            p.xlabel('$\Delta$ joints')
-            #p.ylabel('$\Delta$ substrate')
-            p.ylabel('$\Delta$ Links')
+            p.xlabel('$\Delta$ bonds')
+            p.ylabel('$\Delta$ substrate')
+            #p.ylabel('$\Delta$ links')
             fig3.savefig('images/fig3.png')
+
+            conv = reduce(np.add,np.gradient(_dx)) + reduce(np.add,np.gradient(_dy))
+            print(_dx)
 
             exit()
 

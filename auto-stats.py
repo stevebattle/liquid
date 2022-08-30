@@ -51,15 +51,15 @@ class Stats(Autopoiesis):
             pearLJ, pvalueLJ = pearsonr(dataL, dataJ)
             print("Pearson Correlation coefficient for L,J= {0}".format(pearLJ))
             print("p-value = {0}".format(pvalueLJ))
-            if pvalueLJ<0.5:
-                print("Significant at 5% level.")
+            if pvalueLJ<0.01:
+                print("Significant at 1% level.")
             print()
 
             pearLS, pvalueLS = pearsonr(dataL, dataS)
             print("Pearson Correlation coefficient for L,S = {0}".format(pearLS))
             print("p-value = {0}".format(pvalueLS))
-            if pvalueLS<0.5:
-                print("Significant at 5% level.")
+            if pvalueLS<0.01:
+                print("Significant at 1% level.")
             print()
 
             exit()
