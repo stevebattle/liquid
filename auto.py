@@ -63,7 +63,7 @@ class Autopoiesis(Framework):
     reserve = []
     bonds = []
 
-    def __init__(self,n=S_POP,delta=DELTA):
+    def __init__(self,n=S_POP):
         global S,L,K
         super(Autopoiesis, self).__init__()
 
@@ -71,7 +71,7 @@ class Autopoiesis(Framework):
         self.countL = 0
         self.countJ = 0
         self.lastTime = time()
-        self.delta = delta # Wiener process
+        self.delta = DELTA # Wiener process
 
         # weightless world
         self.world.gravity = (0, 0)

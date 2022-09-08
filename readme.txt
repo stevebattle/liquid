@@ -12,7 +12,7 @@ Installation
 Run Simulated Autopoiesis (auto.py)
 
 conda activate pybox2d
-python -m auto --backend=pygame
+python auto.py
 
 
 Plot figures (produces fig1.png, fig2.png, fig3.png)
