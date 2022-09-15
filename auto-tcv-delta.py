@@ -72,7 +72,4 @@ class TCV(Autopoiesis):
 # By varying delta we are in effect varying the temperature
 
 if __name__ == "__main__":
-    dataS = []
-    dataL = []
-    dataJ = []
     TCV().run()
