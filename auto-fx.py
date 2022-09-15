@@ -55,7 +55,7 @@ DECAY_RATE = 0.001
 CENTERING = 8
 
 # Wiener Process parameter
-DELTA = 15
+DELTA = 10
 
 # A fixture binds a shape to a body and adds material properties such as density, friction, restitution. 
 # The components are ranked by increasing 'mass' as S, L, K.
